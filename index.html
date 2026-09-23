@@ -35,6 +35,11 @@ hs.forEach(function(h,i){
 });
 // robust highlight: last heading whose top is above 40% of the doc's visible area
 function update(){
+  // if scrolled to (or near) the bottom, force the last section active
+  if (doc.scrollTop + doc.clientHeight >= doc.scrollHeight - 2) {
+    links.forEach(function(a, j){ a.classList.toggle('active', j === hs.length - 1); });
+    return;
+  }
   var line = doc.getBoundingClientRect().top + doc.clientHeight * 0.4;
   var active = 0;
   for (var i = 0; i < hs.length; i++) {
