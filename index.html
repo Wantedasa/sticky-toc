@@ -10,18 +10,41 @@
     font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background:#0d1117; color:#e6edf3; padding:24px; text-align:center; }
   .tag { font-size:.8rem; color:#8b949e; }
   .note { font-size:.8rem; color:#6b7280; max-width:520px; }
-  #toc a{display:block;color:#8b949e;text-decoration:none;padding:4px 0}#toc a.active{color:#58a6ff}
-  .wrap{display:flex;gap:18px;width:100%;max-width:560px;text-align:left}
+  #toc a{display:block;color:#8b949e;text-decoration:none;padding:4px 0;transition:color .15s}#toc a.active{color:#58a6ff}
+  .wrap{display:flex;gap:18px;width:100%;max-width:560px;text-align:left;align-items:flex-start}
   .doc{height:220px;overflow:auto;flex:1;
     scrollbar-width:none; -ms-overflow-style:none;}
   .doc::-webkit-scrollbar{display:none;width:0;height:0;}
+  .doc h2{margin:0 0 6px;font-size:1.1rem} .doc p{margin:0 0 40px;color:#8b949e}
 </style>
 </head>
 <body>
-<div class="wrap"><nav id="toc" style="position:sticky;top:0;align-self:flex-start;min-width:140px;font-size:.85rem"></nav><div id="doc" class="doc"><h2>Intro</h2><p style="color:#8b949e">Scroll me.</p><h2>Details</h2><p style="color:#8b949e">More text here.</p><h2>End</h2><p style="color:#8b949e">That is it.</p></div></div>
+<div class="wrap"><nav id="toc" style="min-width:140px;font-size:.85rem"></nav><div id="doc" class="doc"><h2>Intro</h2><p>Scroll me.</p><h2>Details</h2><p>More text here. Keep scrolling to see the highlight follow the section you are reading.</p><h2>End</h2><p>That is it.</p></div></div>
 
 <script>
-var toc=document.getElementById('toc'),doc=document.getElementById('doc');var hs=doc.querySelectorAll('h2');hs.forEach(function(h,i){var a=document.createElement('a');a.href='#';a.textContent=(i+1)+'. '+h.textContent;a.onclick=function(e){e.preventDefault();h.scrollIntoView({behavior:'smooth'});};toc.appendChild(a);});var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){var i=Array.prototype.indexOf.call(hs,e.target);toc.querySelectorAll('a').forEach(function(a,j){a.classList.toggle('active',j===i);});}});});hs.forEach(function(h){io.observe(h);});
+var toc=document.getElementById('toc'),doc=document.getElementById('doc');
+var hs=doc.querySelectorAll('h2');
+var links=[];
+hs.forEach(function(h,i){
+  var a=document.createElement('a');
+  a.href='#';
+  a.textContent=(i+1)+'. '+h.textContent;
+  a.onclick=function(e){e.preventDefault();h.scrollIntoView({behavior:'smooth'});};
+  toc.appendChild(a);
+  links.push(a);
+});
+// robust highlight: the last heading whose top is above 40% of the container height
+function update(){
+  var line=doc.clientHeight*0.4;
+  var active=0;
+  for(var i=0;i<hs.length;i++){
+    if(hs[i].offsetTop - doc.scrollTop <= line) active=i;
+  }
+  links.forEach(function(a,j){a.classList.toggle('active',j===active);});
+}
+doc.addEventListener('scroll',update);
+window.addEventListener('resize',update);
+update();
 </script>
 </body>
 </html>
